@@ -8,5 +8,9 @@ Commands
 --------
   * help       - Prints all commands, or a specific command's help.
   * exit/quit  - Stops gomap.
-  * function   - If no args, then it prints out all functions in you project. Else it print all the instances of the function.
-  * file       - If no args, prints out all the files in the project. Else it prints all the functions in the file.
+  * function   - If no args, then it prints out all functions in you project.
+                  Else it print all the instances of the function.
+  * file       - If no args, prints out all the files in the project.
+                  Else it prints all the functions in the file.
+  * stat       - Gives the stats for the current project. Includes
+                  lots of random stuff :) (4 things)
