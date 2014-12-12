@@ -5,27 +5,15 @@ import (
   "os"
   "fmt"
   "strings"
+  "github.com/Rex--/gomap/map"
   )
 
-type IProject struct {
-  Name string
-  Path string
-  Functions map[FuncsKey]string
-  Files map[string]string
-}
-
-type FuncsKey struct {
-  Filename   string
-  FilePath   string
-  LineNumber int
-}
-
 type ICLInterface struct {
-  Project *IProject
+  Project *gomap.Project
   cmds map[string]*Command
 }
 
-func NewICLInterface(project *IProject) (cli *ICLInterface) {
+func NewICLInterface(project *gomap.Project) (cli *ICLInterface) {
   c := getCommands()
   cli = &ICLInterface{
     Project: project,

@@ -6,7 +6,7 @@ It currently doesn't support saving the projects, but it opens them quick enough
 
 Commands
 --------
-  * help     - Prints all commands, or a specific command's help.
-  * stop     - Stops gomap.
-  * function - If no args, then it prints out all functions in you project. Else it print all the instances of the function.
-  * file     - If no args, prints out all the files in the project. Else it prints all the functions in the file.
+  * help       - Prints all commands, or a specific command's help.
+  * exit/quit  - Stops gomap.
+  * function   - If no args, then it prints out all functions in you project. Else it print all the instances of the function.
+  * file       - If no args, prints out all the files in the project. Else it prints all the functions in the file.

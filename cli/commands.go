@@ -28,7 +28,8 @@ func getCommands() (cmds map[string]*Command) {
   cmds[cmdHelp] = NewCommand(cmdHelp, descHelp, usageHelp, help)
   cmds[cmdFile] = NewCommand(cmdFile, descFile, usageFile, file)
   cmds[cmdFunction] = NewCommand(cmdFunction, descFunction, usageFunction, function)
-  cmds[cmdStop] = NewCommand(cmdStop, descStop, usageStop, stop)
+  cmds[cmdExit] = NewCommand(cmdExit, descExit, usageExit, exit)
+  cmds[exitAlias] = NewCommand(exitAlias, descExit, usageExit, exit)
   return
 }
 
@@ -124,15 +125,16 @@ func function(cli *ICLInterface, command string) (bool){
 }
 
 
-const cmdStop = "stop"
-const descStop = "Stops the program gracefully."
-const usageStop = "stop"
+const cmdExit = "exit"
+const descExit = "Exits the program gracefully."
+const usageExit = "exit | quit"
+const exitAlias = "quit"
 
-func stop(cli *ICLInterface, command string) (bool){
+func exit(cli *ICLInterface, command string) (bool){
   args := strings.Split(command, " ")
 
   if len(args) > 1 {
-    fmt.Println(usageStop)
+    fmt.Println(usageExit)
   }
 
   if len(args) == 1 {
