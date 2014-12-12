@@ -11,10 +11,11 @@ import (
   // Project interface holds "Functions", or a map of functions.
   //  Base interface for each project
 type Project struct {
-  Name string
-  Path string
-  Functions map[FuncsKey]string
-  Files map[string]string
+  Name       string
+  Path       string
+  Functions  map[FuncsKey]string
+  Files      map[string]string
+  Stats      *Stat
 }
 
   // IProjectKey holds a filepath, filename, and a line number relating to each and
@@ -23,6 +24,13 @@ type FuncsKey struct {
   Filename   string
   FilePath   string
   LineNumber int
+}
+
+  // Stat structure holds all the statistic information I want to keep(Or think of keeping)
+type Stat struct {
+  FileCount int
+  FuncCount int
+  LineCount int
 }
 
 
@@ -57,9 +65,10 @@ func (project *Project)FilesInProject() (err error) {
 
 // getFunctionFromFiles takes a path as an argument and gets all the functions from
 //    the file if it is good formatted go code.
-func (project *Project)FunctionsFromFiles() (err error) {
+func (project *Project)FunctionsFromFiles() (tFu, tFi, tL int, err error) {
   project.Functions = make(map[FuncsKey]string)
   for k, v := range project.Files {
+    tFi++
     file, err := os.Open(v)
     if err != nil {
       fmt.Println("Error opening file:", err.Error())
@@ -75,6 +84,7 @@ func (project *Project)FunctionsFromFiles() (err error) {
     var bLine []byte
     var sLine string
     for i := 1; i != 0; i++ {
+      tL++
       bLine, _, err = reader.ReadLine()
       if err != nil {
         if err.Error() == "EOF" {
@@ -87,43 +97,10 @@ func (project *Project)FunctionsFromFiles() (err error) {
 
       // There is a function being declard on this line
       if strings.HasPrefix(sLine, "func") {
+        tFu++
         project.Functions[FuncsKey{k, v, i}] = sLine
       }
     }
   }
-
-  // Open source file and check to see if it could. Defer to close it.
-  // file, err := os.Open(filepath)
-  // if err != nil {
-  //   fmt.Println("Error opening file:", err.Error())
-  // }
-  // defer func() {
-  //   if err := file.Close(); err != nil {
-  //     fmt.Println("Error closing file:", err.Error())
-  //     }
-  // }()
-  //
-  // // Make a new reader for the file
-  // reader := bufio.NewReader(file)
-  //
-  // // Start at zero and count up each line until we get an "EOF" error that means its the
-  // //    *surprise**surprise* End of File!
-  // var bLine []byte
-  // var sLine string
-  // for c := 1; c != 0; c++ {
-  // bLine, _, err = reader.ReadLine()
-  // if err != nil {
-  //   if err.Error() == "EOF"{
-  //     break
-  //     } else {
-  //       fmt.Println("Error reading line:", err.Error())
-  //     }
-  //   }
-  //   sLine = string(bLine[:])
-  //     // Is a function
-  //   if strings.HasPrefix(sLine, "func") {
-  //     project.Functions[gomap.FuncsKey{filename, filepath, c}] = sLine
-  //   }
-  // }
-  return nil
+  return
 }

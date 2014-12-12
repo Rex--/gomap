@@ -30,6 +30,7 @@ func getCommands() (cmds map[string]*Command) {
   cmds[cmdFunction] = NewCommand(cmdFunction, descFunction, usageFunction, function)
   cmds[cmdExit] = NewCommand(cmdExit, descExit, usageExit, exit)
   cmds[exitAlias] = NewCommand(exitAlias, descExit, usageExit, exit)
+  cmds[cmdStat] = NewCommand(cmdStat, descStat, usageStat, stat)
   return
 }
 
@@ -56,7 +57,7 @@ func help(cli *ICLInterface, command string) (bool){
   if len(args) == 1 {
     fmt.Println("Commands:")
     for cmd, _ := range cli.cmds {
-      fmt.Println(" - ", cmd)
+      fmt.Println(" -", cmd)
     }
   }
   return true
@@ -134,12 +135,33 @@ func exit(cli *ICLInterface, command string) (bool){
   args := strings.Split(command, " ")
 
   if len(args) > 1 {
-    fmt.Println(usageExit)
+    fmt.Println("Usage:", usageExit)
   }
 
   if len(args) == 1 {
     fmt.Println("Stopping gomap. Goodbye :D")
     return false
+  }
+  return true
+}
+
+const cmdStat = "stat"
+const descStat = "Gets the stats about your project"
+const usageStat = "stat"
+
+func stat(cli *ICLInterface, command string) (bool) {
+  args := strings.Split(command, " ")
+
+  if len(args) > 1 {
+    fmt.Println("Usage:", usageStat)
+  }
+
+  if len(args) == 1 {
+    fmt.Println("Project: ", cli.Project.Name)
+    fmt.Println("Path to Project: ", cli.Project.Path)
+    fmt.Println("Total files in project: ", cli.Project.Stats.FileCount)
+    fmt.Println("Total functions in project: ", cli.Project.Stats.FuncCount)
+    fmt.Println("Total line count in all: ", cli.Project.Stats.LineCount)
   }
   return true
 }
