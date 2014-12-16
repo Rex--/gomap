@@ -25,23 +25,35 @@ func main() {
   fmt.Print("Enter your full project's path: ")
   proPath, _ := inRd.ReadString('\n')
   proPath = strings.TrimSuffix(proPath, "\n") // Remove the newline(\n) off the end
-  project.Path = proPath
+  if exists(proPath) {
+    project.Path = proPath
 
-  err := project.FilesInProject()
-  if err != nil {
-    fmt.Println("Error getting files in your project")
+    err := project.FilesInProject()
+    if err != nil {
+      fmt.Println("Error getting files in your project")
+    }
+
+    tFu, tFi, tL, err := project.FunctionsFromFiles()
+    if err != nil {
+      fmt.Println("Error getting functions in files")
+    }
+
+    project.Stats = &gomap.Stat{}
+    project.Stats.FileCount = tFi
+    project.Stats.FuncCount = tFu
+    project.Stats.LineCount = tL
+
+    cL := cli.NewICLInterface(&project)
+    cL.Start()
+  } else {
+    fmt.Println("Path does not exist. Exiting...")
   }
+}
 
-  tFu, tFi, tL, err := project.FunctionsFromFiles()
-  if err != nil {
-    fmt.Println("Error getting functions in files")
-  }
-
-  project.Stats = &gomap.Stat{}
-  project.Stats.FileCount = tFi
-  project.Stats.FuncCount = tFu
-  project.Stats.LineCount = tL
-
-  cL := cli.NewICLInterface(&project)
-  cL.Start()
+//Thanks stackoverflow: http://stackoverflow.com/questions/10510691/how-to-check-whether-a-file-or-directory-denoted-by-a-path-exists-in-golang
+func exists(path string) (bool) {
+  _, err := os.Stat(path)
+  if err == nil { return true }
+  if os.IsNotExist(err) { return false }
+  return false
 }
