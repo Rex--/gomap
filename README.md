@@ -14,3 +14,4 @@ Commands
                   Else it prints all the functions in the file.
   * stat       - Gives the stats for the current project. Includes
                   lots of random stuff :) (4 things)
+  * search     - Searches all the files for the string you provide as an argument.

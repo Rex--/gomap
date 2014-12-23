@@ -31,6 +31,7 @@ func getCommands() (cmds map[string]*Command) {
   cmds[cmdExit] = NewCommand(cmdExit, descExit, usageExit, exit)
   cmds[exitAlias] = NewCommand(exitAlias, descExit, usageExit, exit)
   cmds[cmdStat] = NewCommand(cmdStat, descStat, usageStat, stat)
+  cmds[cmdSearch] = NewCommand(cmdSearch, descSearch, usageSearch, search)
   return
 }
 
@@ -162,6 +163,32 @@ func stat(cli *ICLInterface, command string) (bool) {
     fmt.Println("Total files in project: ", cli.Project.Stats.FileCount)
     fmt.Println("Total functions in project: ", cli.Project.Stats.FuncCount)
     fmt.Println("Total line count in all: ", cli.Project.Stats.LineCount)
+  }
+  return true
+}
+
+
+const cmdSearch = "search"
+const descSearch = "Searches for the string in all files and prints out the location."
+const usageSearch = "search [string]"
+
+func search(cli *ICLInterface, command string) (bool) {
+  args := strings.Split(command, " ")
+
+  if len(args) != 2 {
+    fmt.Println("Usage:", usageSearch)
+  }
+
+  if len(args) == 2 {
+    lines, err := cli.Project.SearchInFiles(args[1])
+    if err != nil {
+      fmt.Println("Error:", err.Error())
+    }
+    for k, v := range lines {
+      fmt.Println(v)
+      fmt.Println("  -Filename:", k.Filename)
+      fmt.Println("  -Line Number:", k.LineNumber)
+    }
   }
   return true
 }

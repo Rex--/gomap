@@ -13,14 +13,14 @@ import (
 type Project struct {
   Name       string
   Path       string
-  Functions  map[FuncsKey]string
+  Functions  map[Key]string
   Files      map[string]string
   Stats      *Stat
 }
 
   // IProjectKey holds a filepath, filename, and a line number relating to each and
   //    every function in the project tree
-type FuncsKey struct {
+type Key struct {
   Filename   string
   FilePath   string
   LineNumber int
@@ -66,7 +66,7 @@ func (project *Project)FilesInProject() (err error) {
 // getFunctionFromFiles takes a path as an argument and gets all the functions from
 //    the file if it is good formatted go code.
 func (project *Project)FunctionsFromFiles() (tFu, tFi, tL int, err error) {
-  project.Functions = make(map[FuncsKey]string)
+  project.Functions = make(map[Key]string)
   for k, v := range project.Files {
     tFi++
     file, err := os.Open(v)
@@ -98,9 +98,43 @@ func (project *Project)FunctionsFromFiles() (tFu, tFi, tL int, err error) {
       // There is a function being declard on this line
       if strings.HasPrefix(sLine, "func") {
         tFu++
-        project.Functions[FuncsKey{k, v, i}] = sLine
+        project.Functions[Key{k, v, i}] = sLine
       }
     }
   }
   return
+}
+
+func (project *Project)SearchInFiles(keyword string) (lines map[Key]string, err error) {
+  lines = make(map[Key]string)
+  for k, v := range project.Files {
+    file, err := os.Open(v)
+    if err != nil {
+      return nil, err
+    }
+    defer func() {
+      if err := file.Close(); err != nil {
+        fmt.Println("Error:", err.Error())
+      }
+    }()
+
+    reader := bufio.NewReader(file)
+
+    for i := 1; i != 0; i++ {
+      bLine, _, err := reader.ReadLine()
+      if err != nil {
+        if err.Error() == "EOF" {
+          break
+        } else {
+          return nil, err
+        }
+      }
+      sLine := string(bLine[:])
+
+      if strings.Contains(sLine, keyword) {
+        lines[Key{k, v, i}] = strings.TrimSpace(sLine)
+      }
+    }
+  }
+  return lines, nil
 }
