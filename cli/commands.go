@@ -11,14 +11,16 @@ type Command struct {
   Trigger string
   Description string
   Usage string
+  Args []string
   CallBack CommandCallBack
 }
 
-func NewCommand(trigger, description, usage string, callback CommandCallBack) (command *Command){
+func NewCommand(trigger, description, usage string, callback CommandCallBack, args ...string) (command *Command){
   return &Command{
     Trigger: trigger,
     Description: description,
     Usage: usage,
+    Args: args,
     CallBack: callback,
   }
 }
@@ -27,7 +29,7 @@ func getCommands() (cmds map[string]*Command) {
   cmds = map[string]*Command{}
   cmds[cmdHelp] = NewCommand(cmdHelp, descHelp, usageHelp, help)
   cmds[cmdFile] = NewCommand(cmdFile, descFile, usageFile, file)
-  cmds[cmdFunction] = NewCommand(cmdFunction, descFunction, usageFunction, function)
+  cmds[cmdFunction] = NewCommand(cmdFunction, descFunction, usageFunction, function, functionArgFuncName, functionArgCalledBy)
   cmds[cmdExit] = NewCommand(cmdExit, descExit, usageExit, exit)
   cmds[exitAlias] = NewCommand(exitAlias, descExit, usageExit, exit)
   cmds[cmdStat] = NewCommand(cmdStat, descStat, usageStat, stat)
@@ -53,12 +55,17 @@ func help(cli *ICLInterface, command string) (bool){
     fmt.Println("Command: ", cmd.Trigger)
     fmt.Println("Description: ", cmd.Description)
     fmt.Println("Usage: ", cmd.Usage)
+    if cmd.Args != nil {
+      for _, i := range cmd.Args {
+        fmt.Println("    ", i)
+      }
+    }
   }
 
   if len(args) == 1 {
     fmt.Println("Commands:")
-    for cmd, _ := range cli.cmds {
-      fmt.Println(" -", cmd)
+    for k, _ := range cli.cmds {
+      fmt.Println("  -", k)
     }
   }
   return true
@@ -98,12 +105,14 @@ func file(cli *ICLInterface, command string) (bool){
 
 const cmdFunction  = "function"
 const descFunction = "Gets all functions, or gets all the instances of the function in your project"
-const usageFunction = "function | function [function name]"
+const usageFunction = "function | function [args]"
+const functionArgFuncName = "function [function name]  -  This will return all instances of the function being declared."
+const functionArgCalledBy = "function calledby [function name]  -  This will return all instances of the funciton being called."
 
 func function(cli *ICLInterface, command string) (bool){
   args := strings.Split(command, " ")
 
-  if len(args) > 2 {
+  if len(args) > 3 {
     fmt.Println("Usage:", usageFunction)
   }
 
@@ -121,6 +130,19 @@ func function(cli *ICLInterface, command string) (bool){
         fmt.Println("  -Filename:", k.Filename)
         fmt.Println("  -Line Number:",k.LineNumber)
       }
+    }
+  }
+
+  if len(args) == 3 {
+    lines, err := cli.Project.SearchInFiles("." + args[2])
+    if err != nil {
+      fmt.Println("Error:", err.Error())
+    }
+
+    for k, v := range lines {
+      fmt.Println(v)
+      fmt.Println("  -Filename:", k.Filename)
+      fmt.Println("  -Line Number:", k.LineNumber)
     }
   }
   return true
